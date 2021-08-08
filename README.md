@@ -37,20 +37,20 @@ Desenvolver um sistema para controlar as despesas e receitas de clientes.
 
 
 
-create or replace trigger TRIGGRA_CAMP_TOTAL_MOVI_STATUS
-after INSERT on CONTA
-DECLARE
-vid_conta CONTA.id%type;
-vitipo_movi CONTA.tip_movimentacoes%type;
-BEGIN
-select MAX(id) into vid_conta from conta;
-select tip_movimentacoes into vitipo_movi from conta where id = vid_conta;
-IF(vitipo_movi = 'D')THEN
-    UPDATE CONTA SET MOVIMENTACOES_DEB = (MOVIMENTACOES_DEB+1), TOTAL = (select sum(valor) from conta where id = vid_conta) WHERE ID = vid_conta;
-ELSE
-    UPDATE CONTA SET MOVIMENTACOES_CRE = (MOVIMENTACOES_CRE+1), TOTAL = (select sum(valor) from conta where id = vid_conta) WHERE ID = vid_conta;
-END IF;
-END;
+create or replace trigger TRIGGRA_CAMP_TOTAL_MOVI_STATUS&nbsp;
+after INSERT on CONTA&nbsp;
+DECLARE&nbsp;
+vid_conta CONTA.id%type;&nbsp;
+vitipo_movi CONTA.tip_movimentacoes%type;&nbsp;
+BEGIN&nbsp;
+select MAX(id) into vid_conta from conta;&nbsp;
+select tip_movimentacoes into vitipo_movi from conta where id = vid_conta;&nbsp;
+IF(vitipo_movi = 'D')THEN&nbsp;
+    UPDATE CONTA SET MOVIMENTACOES_DEB = (MOVIMENTACOES_DEB+1), TOTAL = (select sum(valor) from conta where id = &nbsp;vid_conta) WHERE ID = vid_conta;&nbsp;
+ELSE&nbsp;
+    UPDATE CONTA SET MOVIMENTACOES_CRE = (MOVIMENTACOES_CRE+1), TOTAL = (select sum(valor) from conta where id = &nbsp;vid_conta) WHERE ID = vid_conta;&nbsp;
+END IF;&nbsp;
+END;&nbsp;
 
 
 
@@ -58,25 +58,25 @@ END;
 
 
 
-create or replace trigger TRIGGRA_XPTO_CARGA
-AFTER INSERT on CONTA
-DECLARE
-vid_conta CONTA.id%type;
-vid_cli_conta conta.id_cliente%type;
+create or replace trigger TRIGGRA_XPTO_CARGA&nbsp;
+AFTER INSERT on CONTA&nbsp;
+DECLARE&nbsp;
+vid_conta CONTA.id%type;&nbsp;
+vid_cli_conta conta.id_cliente%type;&nbsp;
 
-vnome_cli cliente.nome%type;
-vdata_cli cliente.data_cadastro%type;
-vid_cli cliente.id%type;
-BEGIN
-select MAX(id) into vid_conta from conta;
-select MAX(id_cliente) into vid_cli_conta from conta;
+vnome_cli cliente.nome%type;&nbsp;
+vdata_cli cliente.data_cadastro%type;&nbsp;
+vid_cli cliente.id%type;&nbsp;
+BEGIN&nbsp;
+select MAX(id) into vid_conta from conta;&nbsp;
+select MAX(id_cliente) into vid_cli_conta from conta;&nbsp;
 
-select nome,data_cadastro,id into vnome_cli,vdata_cli,vid_cli from cliente where id = vid_cli_conta;
+select nome,data_cadastro,id into vnome_cli,vdata_cli,vid_cli from cliente where id = vid_cli_conta;&nbsp;
 
-INSERT INTO EMPRESA_XPTO (id_xpt,cliente_nome,data_clinte,id_cliente,id_conta_clinte,movi_cli,data_cadastro,valor_movi)
-values
-(sec_xpto_id.nextval,vnome_cli,vdata_cli,vid_cli,vid_conta,1,sysdate,0);
-END;
+INSERT INTO EMPRESA_XPTO (id_xpt,cliente_nome,data_clinte,id_cliente,id_conta_clinte,movi_cli,data_cadastro,valor_movi)&nbsp;
+values&nbsp;
+(sec_xpto_id.nextval,vnome_cli,vdata_cli,vid_cli,vid_conta,1,sysdate,0);&nbsp;
+END;&nbsp;
 
 
 
@@ -84,28 +84,28 @@ END;
 
 
 
-CREATE OR REPLACE VIEW V_CLIENTE_01
-AS
-select 
-cont.id_cliente,
-cli.nome as cliente,
-to_char(trunc(cli.data_cadastro),'DD/MM/YYYY') as cliente_desde,
-ende.rua||' - '||ende.numero||' - '||ende.complemento||' - '||ende.bairro||' - '||ende.cidade||' - '||ende.uf||' - '||ende.cep as endereco,
-sum(cont.movimentacoes_cre)as Movimentações_de_crédito,
-sum(cont.movimentacoes_deb) as Movimentações_de_débito,
-sum(cont.total) as Saldo_inicial
-from cliente cli
-join endereco ende
-on ende.id_clinte = cli.id
-join conta cont
-on cont.id_cliente = cli.id
-GROUP BY cli.nome,cli.data_cadastro,
-ende.rua,
-ende.numero,
-ende.complemento,
-ende.bairro,
-ende.cidade,
-ende.uf,
-ende.cep,
-cont.id_cliente,
-cli.id;
+CREATE OR REPLACE VIEW V_CLIENTE_01&nbsp;
+AS&nbsp;
+select &nbsp;
+cont.id_cliente,&nbsp;
+cli.nome as cliente,&nbsp;
+to_char(trunc(cli.data_cadastro),'DD/MM/YYYY') as cliente_desde,&nbsp;
+ende.rua||' - '||ende.numero||' - '||ende.complemento||' - '||ende.bairro||' - '||ende.cidade||' - '||ende.uf||' - '||ende.cep &nbsp;as endereco,&nbsp;
+sum(cont.movimentacoes_cre)as Movimentações_de_crédito,&nbsp;
+sum(cont.movimentacoes_deb) as Movimentações_de_débito,&nbsp;
+sum(cont.total) as Saldo_inicial&nbsp;
+from cliente cli&nbsp;
+join endereco ende&nbsp;
+on ende.id_clinte = cli.id&nbsp;
+join conta cont&nbsp;
+on cont.id_cliente = cli.id&nbsp;
+GROUP BY cli.nome,cli.data_cadastro,&nbsp;
+ende.rua,&nbsp;
+ende.numero,&nbsp;
+ende.complemento,&nbsp;
+ende.bairro,&nbsp;
+ende.cidade,&nbsp;
+ende.uf,&nbsp;
+ende.cep,&nbsp;
+cont.id_cliente,&nbsp;
+cli.id;&nbsp;&nbsp;
