@@ -26,10 +26,11 @@ public class Conta {
 
     private String nomeInstituicao;
     private String nomeProprietario;
-    private Double receita;
-    private Double dispesa;
+    private Double valor;
     private Double total;
-    private int movimentacoes;
+    private char tipMovimentacoes;
+    private int MovimentacoesCre;
+    private int MovimentacoesDeb;
     private char status;
     private LocalDate dataCriacao;
     private LocalDate dataMovimentacao;
