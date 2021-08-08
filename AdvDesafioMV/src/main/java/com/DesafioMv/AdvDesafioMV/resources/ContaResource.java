@@ -3,6 +3,7 @@ package com.DesafioMv.AdvDesafioMV.resources;
 
 import com.DesafioMv.AdvDesafioMV.dto.response.MessageResponseDTO;
 import com.DesafioMv.AdvDesafioMV.entities.Conta;
+import com.DesafioMv.AdvDesafioMV.entities.Endereco;
 import com.DesafioMv.AdvDesafioMV.exception.ContaNotFoundException;
 import com.DesafioMv.AdvDesafioMV.services.ContaService;
 import lombok.AllArgsConstructor;
@@ -22,7 +23,7 @@ public class ContaResource {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public MessageResponseDTO createEmpresa(@RequestBody Conta conta){
+    public MessageResponseDTO createConta(@RequestBody Conta conta){
         return contaService.creatConta(conta);
     }
 
@@ -40,8 +41,8 @@ public class ContaResource {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteConta(@PathVariable Long id) throws ContaNotFoundException {
-        contaService.deletarconta(id);
+    public MessageResponseDTO deleteConta(@PathVariable Long id) throws ContaNotFoundException {
+       return contaService.deletarconta(id);
     }
 
 

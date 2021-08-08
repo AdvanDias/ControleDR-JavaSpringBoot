@@ -6,6 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 @Configuration
 @ConfigurationProperties("spring.datasource")
 @Data
@@ -31,5 +35,10 @@ public class AppConfiguration {
         System.out.println(driverClassName);
         System.out.println(url);
         return "DB connection to H2";
+    }
+
+    @Bean
+    public Connection connection(DataSource dataSource) throws SQLException {
+        return dataSource.getConnection();
     }
 }

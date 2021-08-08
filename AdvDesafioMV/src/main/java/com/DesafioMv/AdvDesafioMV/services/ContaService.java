@@ -10,38 +10,46 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class ContaService {
 
-    private ContaRepository clienteRepository;
+    private ContaRepository contaRepository;
 
     public List<Conta> listall() {
-        return  clienteRepository.findAll();
+        List<Conta> contas = contaRepository.findAll();
+        List<Conta> filtro = contas.stream().filter(c -> c.getStatus() == 'A').collect(Collectors.toList());
+        return  filtro;
     }
 
 
-    public MessageResponseDTO creatConta(Conta cliente) {
-        Conta saveConta = clienteRepository.save(cliente);
+    public MessageResponseDTO creatConta(Conta conta) {
+        Conta saveConta = contaRepository.save(conta);
         return MessageResponseDTO
                 .builder()
-                .message("Created Empresa with ID "+ saveConta.getId())
+                .message("Created Conta with ID "+ saveConta.getId())
                 .build();
     }
 
     public Conta FindByid(Long id) throws ContaNotFoundException {
-        Conta cliente = verifyIfExists(id);
-        return cliente;
+        Conta conta = verifyIfExists(id);
+        return conta;
     }
 
-    public void deletarconta(Long id) throws ContaNotFoundException {
-        Conta cliente = verifyIfExists(id);
-        clienteRepository.deleteById(id);
+    public MessageResponseDTO deletarconta(Long id) throws ContaNotFoundException {
+        Conta contabyId = verifyIfExists(id);
+        contabyId.setStatus('C');
+        Conta exclusaoLogicaConta = contaRepository.save(contabyId);
+        return MessageResponseDTO
+                .builder()
+                .message("Conta with ID "+ exclusaoLogicaConta.getId())
+                .build();
     }
 
     private Conta verifyIfExists(Long id) throws ContaNotFoundException{
-        return clienteRepository.findById(id).orElseThrow(() -> new ContaNotFoundException(id));
+        return contaRepository.findById(id).orElseThrow(() -> new ContaNotFoundException(id));
     }
 
 }

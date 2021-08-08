@@ -25,7 +25,7 @@ public class EnderecoService {
         Endereco saveEndereco = enderecoRepository.save(endereco);
         return MessageResponseDTO
                 .builder()
-                .message("Created Empresa with ID "+ saveEndereco.getId())
+                .message("Created Endereco with ID "+ saveEndereco.getId())
                 .build();
     }
 
@@ -44,7 +44,7 @@ public class EnderecoService {
         Endereco enderecoUpdate = enderecoRepository.save(endereco);
         return MessageResponseDTO
                 .builder()
-                .message("Created empresa with ID "+ enderecoUpdate.getId())
+                .message("Update Endereco with ID "+ enderecoUpdate.getId())
                 .build();
     }
 

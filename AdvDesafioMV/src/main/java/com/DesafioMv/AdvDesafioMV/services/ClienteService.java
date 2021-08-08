@@ -25,7 +25,7 @@ public class ClienteService {
         Cliente saveCliente = clienteRepository.save(cliente);
         return MessageResponseDTO
                 .builder()
-                .message("Created Empresa with ID "+ saveCliente.getId())
+                .message("Created Cliente with ID "+ saveCliente.getId())
                 .build();
     }
 
@@ -44,7 +44,7 @@ public class ClienteService {
         Cliente clienteUpdate = clienteRepository.save(cliente);
         return MessageResponseDTO
                 .builder()
-                .message("Created empresa with ID "+ clienteUpdate.getId())
+                .message("Created Cliente with ID "+ clienteUpdate.getId())
                 .build();
     }
 

@@ -26,7 +26,7 @@ public class TelefoneService {
         Telefone saveTelefone = telefoneRepository.save(telefone);
         return MessageResponseDTO
                 .builder()
-                .message("Created Empresa with ID "+ saveTelefone.getId())
+                .message("Created Telefone with ID "+ saveTelefone.getId())
                 .build();
     }
 
@@ -45,7 +45,7 @@ public class TelefoneService {
         Telefone telefoneUpdate = telefoneRepository.save(telefone);
         return MessageResponseDTO
                 .builder()
-                .message("Created empresa with ID "+ telefoneUpdate.getId())
+                .message("Created Telefone with ID "+ telefoneUpdate.getId())
                 .build();
     }
 
