@@ -53,58 +53,57 @@ END;&nbsp;<br/>
 
 
 
-- **Trigger para popular a tabela  EMPRESA_XPTO, tabela responsável por dados do relatório.**
+- **Function responsável pelo cálculo da quantidade de operações (entradas e saídas).**
 
 
 
-create or replace trigger TRIGGRA_XPTO_CARGA&nbsp;<br/>
-AFTER INSERT on CONTA&nbsp;<br/>
-DECLARE&nbsp;<br/>
-vid_conta CONTA.id%type;&nbsp;<br/>
-vid_cli_conta conta.id_cliente%type;&nbsp;<br/>
-
-vnome_cli cliente.nome%type;&nbsp;<br/>
-vdata_cli cliente.data_cadastro%type;&nbsp;<br/>
-vid_cli cliente.id%type;&nbsp;<br/>
-BEGIN&nbsp;<br/>
-select MAX(id) into vid_conta from conta;&nbsp;<br/>
-select MAX(id_cliente) into vid_cli_conta from conta;&nbsp;<br/>
-
-select nome,data_cadastro,id into vnome_cli,vdata_cli,vid_cli from cliente where id = vid_cli_conta;&nbsp;<br/>
-
-INSERT INTO EMPRESA_XPTO (id_xpt,cliente_nome,data_clinte,id_cliente,id_conta_clinte,movi_cli,data_cadastro,valor_movi)&nbsp;<br/>
-values&nbsp;<br/>
-(sec_xpto_id.nextval,vnome_cli,vdata_cli,vid_cli,vid_conta,1,sysdate,0);&nbsp;<br/>
-END;&nbsp;<br/>
+CREATE OR REPLACE FUNCTION calculo_empresa_xpto<br/>
+(pCod_Curso NUMBER) RETURN NUMBER<br/>
+AS<br/>
+  vValor FLOAT;<br/>
+BEGIN<br/>
+ vValor := 0;<br/>
+ IF(pCod_Curso <= 10)THEN<br/>
+    vValor := pCod_Curso * 1;<br/>
+ ELSIF(pCod_Curso > 10 and pCod_Curso <= 20) THEN<br/>
+    vValor := pCod_Curso * 0.75;<br/>
+ ELSIF(pCod_Curso > 20) THEN<br/>
+    vValor := pCod_Curso * 0.50;<br/>
+ END IF;<br/>
+  RETURN(vValor);<br/>
+END;<br/>
 
 
 
-- **View para organização dos dados para o relatório.**
+- **View para o relatório dos clientes.**
 
 
 
-CREATE OR REPLACE VIEW V_CLIENTE_01&nbsp;<br/>
-AS&nbsp;<br/>
-select &nbsp;<br/>
-cont.id_cliente,&nbsp;<br/>
-cli.nome as cliente,&nbsp;<br/>
-to_char(trunc(cli.data_cadastro),'DD/MM/YYYY') as cliente_desde,&nbsp;<br/>
-ende.rua||' - '||ende.numero||' - '||ende.complemento||' - '||ende.bairro||' - '||ende.cidade||' - '||ende.uf||' - '||ende.cep as endereco,&nbsp;<br/>
-sum(cont.movimentacoes_cre)as Movimentações_de_crédito,&nbsp;<br/>
-sum(cont.movimentacoes_deb) as Movimentações_de_débito,&nbsp;<br/>
-sum(cont.total) as Saldo_inicial&nbsp;<br/>
-from cliente cli&nbsp;<br/>
-join endereco ende&nbsp;<br/>
-on ende.id_clinte = cli.id&nbsp;<br/>
-join conta cont&nbsp;<br/>
-on cont.id_cliente = cli.id&nbsp;<br/>
-GROUP BY cli.nome,cli.data_cadastro,&nbsp;<br/>
-ende.rua,&nbsp;<br/>
-ende.numero,&nbsp;<br/>
-ende.complemento,&nbsp;<br/>
-ende.bairro,&nbsp;<br/>
-ende.cidade,&nbsp;<br/>
-ende.uf,&nbsp;<br/>
-ende.cep,&nbsp;<br/>
-cont.id_cliente,&nbsp;<br/>
-cli.id;&nbsp;&nbsp;<br/>
+CREATE OR REPLACE VIEW V_CLIENTE_01<br/>
+AS<br/>
+select <br/>
+cont.id_cliente,<br/>
+cli.nome as cliente,<br/>
+to_char(trunc(cli.data_cadastro),'DD/MM/YYYY') as cliente_desde,<br/>
+ende.rua||' - '||ende.numero||' - '||ende.complemento||' - '||ende.bairro||' - '||ende.cidade||' - '||ende.uf||' - '||ende.cep as endereco,<br/>
+sum(cont.movimentacoes_cre)as Movimentações_de_crédito,<br/>
+sum(cont.movimentacoes_deb) as Movimentações_de_débito,<br/>
+(sum(movimentacoes_deb)+sum(movimentacoes_cre)) as Total_de_movimentações,<br/>
+calculo_empresa_xpto((sum(movimentacoes_deb)+sum(movimentacoes_cre)))as Valor_pago_pelas_movimentações,<br/>
+sum(cont.total) as Saldo_inicial,<br/>
+(sum(cont.total) - calculo_empresa_xpto((sum(movimentacoes_deb)+sum(movimentacoes_cre)))) as Saldo_Atual<br/>
+from cliente cli<br/>
+join endereco ende<br/>
+on ende.id_clinte = cli.id<br/>
+join conta cont<br/>
+on cont.id_cliente = cli.id<br/>
+GROUP BY cli.nome,cli.data_cadastro,<br/>
+ende.rua,<br/>
+ende.numero,<br/>
+ende.complemento,<br/>
+ende.bairro,<br/>
+ende.cidade,<br/>
+ende.uf,<br/>
+ende.cep,<br/>
+cont.id_cliente,<br/>
+cli.id;<br/>
